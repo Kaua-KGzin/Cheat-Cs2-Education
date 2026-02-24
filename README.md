@@ -150,3 +150,4 @@ rodar.bat
 - O projeto foi pensado para aprendizado pratico de visao computacional em tempo real.
 - A calibracao (`F3`) e essencial quando cor/iluminacao mudam.
 - Nao e necessario alterar o codigo para rodar no modo basico.
+- Você é livre para usar como quiser, até melhorar.
