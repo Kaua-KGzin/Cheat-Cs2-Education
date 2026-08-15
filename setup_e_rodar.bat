@@ -15,7 +15,7 @@ if errorlevel 1 (
 
 echo  Instalando dependencias...
 python -m pip install --upgrade pip -q
-python -m pip install mss numpy opencv-python pywin32 -q
+python -m pip install -r requirements.txt -q
 
 echo.
 echo  ============================================

@@ -1,0 +1,13 @@
+{
+  "capture_size": 200,
+  "trigger_zone_px": 12,
+  "click_delay_ms": 0,
+  "click_jitter_ms": 15,
+  "max_cps": 18,
+  "min_target_pixels": 8,
+  "hsv_lower": [0, 160, 160],
+  "hsv_upper": [22, 255, 255],
+  "high_red_lower": [165, 150, 100],
+  "high_red_upper": [180, 255, 255],
+  "hue_tolerance": 14
+}
