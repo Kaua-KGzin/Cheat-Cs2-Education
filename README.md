@@ -48,6 +48,7 @@ Dependencias usadas (ver `requirements.txt`):
   - `debug_ui.py`: janela de debug (mascara HSV + HUD)
   - `app.py`: loop principal, hotkeys e tratamento de erros
 - `config.json`: todos os parametros ajustaveis (ver secao abaixo) — gerado automaticamente na primeira execucao se nao existir
+- `configurar.py` / `configurar.bat`: interface grafica (Tkinter) para editar `config.json` sem editar texto a mao
 - `tests/`: testes automatizados da deteccao (`pytest`)
 - `requirements.txt` / `requirements-dev.txt`: dependencias de execucao / desenvolvimento
 - `setup_e_rodar.bat`: instala dependencias e inicia
@@ -76,6 +77,19 @@ Execute:
 ```bat
 rodar.bat
 ```
+
+### Ajustar configuracoes pela interface grafica
+
+Em vez de editar `config.json` manualmente, execute:
+
+```bat
+configurar.bat
+```
+
+Isso abre uma janela (Tkinter, ja incluso no Python) com um campo numerico
+para cada parametro da secao [Configuracoes](#configuracoes-configjson),
+com validacao de faixa e um botao para restaurar os padroes. A cor do alvo
+continua sendo calibrada em tempo real com `F3` durante o uso do bot.
 
 ## Teclas de atalho
 
