@@ -124,6 +124,37 @@ continua sendo calibrada em tempo real com `F3` durante o uso do bot.
 - Erros inesperados no loop (ex.: falha momentanea de captura) sao logados em
   `triggerbot.log` e o bot tenta continuar, em vez de encerrar.
 
+## Latencia e precisao
+
+Ajustes especificos para reduzir tempo de reacao e reduzir falhas de
+deteccao:
+
+- **Resolucao do timer do Windows** (`timeBeginPeriod(1)`): sem isso,
+  `time.sleep()` no Windows arredonda para o tick padrao do scheduler
+  (~15.6ms) — um sleep de 2ms podia na pratica levar ~15ms, fazendo o loop
+  parecer muito mais lento do que o cap configurado. Essa e a causa mais
+  provavel de "engasgos" esporadicos.
+- **Prioridade de thread elevada** (`SetThreadPriority` +
+  `SetPriorityClass`): reduz a chance do Windows atrasar o loop principal
+  para dar tempo a outros processos.
+- **Captura adaptativa**: com o debug desligado (uso normal), o bot captura
+  so a zona de disparo (`trigger_zone_px` + margem) em vez do
+  `capture_size` inteiro — muito menos pixels por frame, logo mais frames
+  por segundo. A captura completa so e usada quando o debug (`F2`) esta
+  ligado, para dar contexto visual.
+- **Thread de clique persistente**: o clique roda numa unica thread de
+  trabalho que fica esperando um sinal, em vez de criar uma thread nova a
+  cada disparo — elimina o overhead de criacao de thread da latencia de
+  reacao.
+
+Se mesmo assim o bot **nao identificar** o alvo (falso negativo), o mais
+comum e calibracao desatualizada ou zona/threshold mal ajustados:
+1. Recalibre com `F3` mirando bem no centro do alvo, com boa iluminacao.
+2. Se o alvo aparece no debug (`F2`) mas o trigger nao dispara, reduza
+   `min_target_pixels` ou aumente `hue_tolerance` pela UI (`configurar.bat`).
+3. Se o alvo nao aparece nem no debug, a cor mudou (iluminacao, skin do
+   alvo) — recalibre.
+
 ## Configuracoes (`config.json`)
 
 O arquivo `config.json` e criado automaticamente na primeira execucao (com os

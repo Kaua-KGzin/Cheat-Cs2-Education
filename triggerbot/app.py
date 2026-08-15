@@ -29,6 +29,10 @@ _DEBOUNCE_SECONDS = 0.20
 _LOOP_BUDGET_SECONDS = 0.002  # cap de ~500 fps, bem acima de qualquer monitor
 _ERROR_BACKOFF_SECONDS = 0.5
 
+# Margem extra (px) ao redor da zona de disparo na captura "enxuta" usada
+# quando o debug esta desligado — evita capturar so o minimo absoluto.
+_DETECT_CAPTURE_MARGIN_PX = 8
+
 
 class _KeyDebouncer:
     def __init__(self) -> None:
@@ -89,19 +93,27 @@ class TriggerBotApp:
             debug_ui.close()
         return self.show_debug
 
+    def _region(self, cx: int, cy: int, size: int) -> dict:
+        half = size // 2
+        return {"left": cx - half, "top": cy - half, "width": size, "height": size}
+
     def run(self) -> None:
         import mss
 
         winapi.raise_process_priority()
+        winapi.raise_thread_priority()
+        winapi.enable_high_res_timer()
+
         sw, sh = winapi.screen_size()
         cx, cy = sw // 2, sh // 2
-        half = self.config.capture_size // 2
-        region = {
-            "left": cx - half,
-            "top": cy - half,
-            "width": self.config.capture_size,
-            "height": self.config.capture_size,
-        }
+
+        # Captura "enxuta" (so a zona de disparo) usada com o debug desligado
+        # -- muito mais rapida que capturar `capture_size` inteiro toda vez.
+        # A captura completa (`capture_size`) so e usada com o debug ligado,
+        # para dar contexto visual na janela.
+        detect_size = 2 * self.config.trigger_zone_px + _DETECT_CAPTURE_MARGIN_PX
+        detect_region = self._region(cx, cy, detect_size)
+        full_region = self._region(cx, cy, self.config.capture_size)
 
         print(BANNER)
         print("  DICA: Abra o Aim Lab, entre num treino e aperte")
@@ -109,53 +121,58 @@ class TriggerBotApp:
 
         prev_debug = False
 
-        with mss.mss() as sct:
-            while True:
-                t0 = time.perf_counter()
-                try:
-                    if self._keys.pressed(winapi.KEY_EXIT):
-                        print("Saindo.")
-                        break
+        try:
+            with mss.mss() as sct:
+                while True:
+                    t0 = time.perf_counter()
+                    try:
+                        if self._keys.pressed(winapi.KEY_EXIT):
+                            print("Saindo.")
+                            break
 
-                    prev_debug = self._handle_keys(sct, cx, cy, prev_debug)
+                        prev_debug = self._handle_keys(sct, cx, cy, prev_debug)
 
-                    frame = grab_bgr(sct, region)
-                    hit = in_trigger_zone(
-                        frame,
-                        self.config.trigger_zone_px,
-                        self.primary,
-                        self.high_red,
-                        self.config.min_target_pixels,
-                    )
-
-                    if self.active and hit:
-                        self.clicker.trigger()
-
-                    self._update_fps()
-
-                    if self.show_debug:
-                        debug_ui.draw(
+                        region = full_region if self.show_debug else detect_region
+                        frame = grab_bgr(sct, region)
+                        hit = in_trigger_zone(
                             frame,
                             self.config.trigger_zone_px,
                             self.primary,
                             self.high_red,
-                            hit,
-                            self.active,
-                            self.clicker.shots_fired,
-                            self._fps_display,
-                            self.config.max_cps,
+                            self.config.min_target_pixels,
                         )
-                except Exception:
-                    logger.exception("Erro no loop principal; tentando continuar em %.1fs.", _ERROR_BACKOFF_SECONDS)
-                    time.sleep(_ERROR_BACKOFF_SECONDS)
-                    continue
 
-                elapsed = time.perf_counter() - t0
-                wait = max(0.0, _LOOP_BUDGET_SECONDS - elapsed)
-                if wait:
-                    time.sleep(wait)
+                        if self.active and hit:
+                            self.clicker.trigger()
 
-        debug_ui.close()
+                        self._update_fps()
+
+                        if self.show_debug:
+                            debug_ui.draw(
+                                frame,
+                                self.config.trigger_zone_px,
+                                self.primary,
+                                self.high_red,
+                                hit,
+                                self.active,
+                                self.clicker.shots_fired,
+                                self._fps_display,
+                                self.config.max_cps,
+                            )
+                    except Exception:
+                        logger.exception(
+                            "Erro no loop principal; tentando continuar em %.1fs.", _ERROR_BACKOFF_SECONDS
+                        )
+                        time.sleep(_ERROR_BACKOFF_SECONDS)
+                        continue
+
+                    elapsed = time.perf_counter() - t0
+                    wait = max(0.0, _LOOP_BUDGET_SECONDS - elapsed)
+                    if wait:
+                        time.sleep(wait)
+        finally:
+            winapi.disable_high_res_timer()
+            debug_ui.close()
 
 
 def run() -> None:
