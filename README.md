@@ -1,18 +1,4 @@
-
-- Checks if crosshairs are over valid targets
-- Applies trigger delay
-- Filters by bone and distance
-
-### `src/overlay.h`
-DirectX/GDI overlay for rendering:
-- Transparent layered window covering entire screen
-- Drawing: boxes, lines, text, health bars, crosshairs, snaplines
-
-## Building from Source
-
-### Prerequisites
-- Windows OS
-- MinGW (g++) compiler# CS2 TriggerBot - C++ Implementation
+# CS2 TriggerBot - C++ Implementation
 
 ## Overview
 This repository contains a C++-based Counter-Strike 2 (CS2) triggerbot source code. The project reads memory from `cs2.exe`, detects enemy entities, and automatically fires when crosshairs are over valid targets.
@@ -99,6 +85,20 @@ World-to-screen conversion using the view matrix. Returns screen coordinates if 
 
 ### `src/trigger.h`
 Trigger bot functionality that:
+- Checks if crosshairs are over valid targets
+- Applies trigger delay
+- Filters by bone and distance
+
+### `src/overlay.h`
+DirectX/GDI overlay for rendering:
+- Transparent layered window covering entire screen
+- Drawing: boxes, lines, text, health bars, crosshairs, snaplines
+
+## Building from Source
+
+### Prerequisites
+- Windows OS
+- MinGW (g++) compiler
 - Windows API headers (included with MinGW)
 
 ### Using GitHub Actions (Recommended)
