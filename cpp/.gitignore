@@ -1,0 +1,20 @@
+# Build artifacts
+build.bat
+build_stderr.txt
+build_stdout.txt
+main.o
+triggerbot.exe
+
+# Configuration (local settings)
+config.cfg
+
+# CS2 Dumper output - offsets are provided separately, not in this repo
+cs2-dumper-main/
+
+# Visual Studio / IDE files
+*.swp
+*.swo
+*.suo
+*.user
+.vscode/
+.idea/
