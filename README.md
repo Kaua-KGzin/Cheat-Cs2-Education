@@ -80,7 +80,7 @@ Contains hardcoded offsets for Source2 classes:
 - `m_fFlags` - Player flags (alive, grounded, etc.)
 - Bone indices (Head, Chest, Stomach, Pelvis)
 
-**⚠️ CRITICAL: Offsets must be updated when CS2 updates!** The `cs2-dumper-main/` folder is excluded from this repo. Get fresh offsets from [cs2-dumper](https://github.com/frk1/cs2-dumper).
+**⚠️ CRITICAL: Offsets must be updated when CS2 updates!** The `cs2-dumper-main/` folder is excluded from this repo. Get fresh offsets from [cs2-dumper](https://github.com/a2x/cs2-dumper).
 
 ### Memory Reading (`src/memory.h`)
 Uses `ReadProcessMemory` to:
