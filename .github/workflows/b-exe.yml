@@ -3,13 +3,17 @@ name: Build TriggerBot
 on:
   push:
     branches: [main]
+    tags:
+      - 'v*'
   pull_request:
     branches: [main]
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -19,10 +23,18 @@ jobs:
         run: choco install mingw -y
 
       - name: Build with g++
-        run: g++ -O2 -std=c++17 -o triggerbot.exe src/main.cpp -lgdi32 -luser32 -lkernel32 -lcomctl32 -static
+        run: g++ -O2 -std=c++17 -o triggerbot.exe cpp/src/main.cpp -lgdi32 -luser32 -lkernel32 -lcomctl32 -static
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: triggerbot
           path: triggerbot.exe
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: triggerbot.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
