@@ -19,7 +19,7 @@ jobs:
         run: choco install mingw -y
 
       - name: Build with g++
-        run: g++ -O2 -std=c++17 -o triggerbot.exe src/main.cpp -lgdi32 -luser32 -lkernel32 -lcomctl32 -static
+        run: g++ -O2 -std=c++17 -o triggerbot.exe cpp/src/main.cpp -lgdi32 -luser32 -lkernel32 -lcomctl32 -static
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
