@@ -1,0 +1,34 @@
+name: Build TriggerBot
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify source files exist
+        run: dir src\main.cpp
+
+      - name: Install MinGW (g++)
+        run: choco install mingw -y
+
+      - name: Verify g++ is available
+        run: g++ --version
+
+      - name: Build with g++
+        run: g++ -O2 -std=c++17 -o triggerbot.exe src/main.cpp -lgdi32 -luser32 -lkernel32 -lcomctl32 -static
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: triggerbot
+          path: triggerbot.exe
